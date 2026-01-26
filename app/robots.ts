@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/auth", "/login"],
     },
-    sitemap: "https://viralsclub.de/sitemap.xml",
+    sitemap: "https://virals.club/sitemap.xml",
   };
 }

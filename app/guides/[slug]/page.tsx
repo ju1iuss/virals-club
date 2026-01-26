@@ -37,7 +37,7 @@ export default async function GuidePage({ params }: { params: Params }) {
             <span className="w-1.5 h-1.5 rounded-full bg-accent-vibrant animate-pulse" />
             {guide.meta.category}
           </div>
-          <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 leading-[1.1] tracking-tight">
+          <h1 className="text-4xl md:text-6xl font-helvetica font-bold mb-6 leading-[1.1] tracking-tight">
             {guide.meta.title}
           </h1>
           {guide.meta.subtitle && (
@@ -76,8 +76,8 @@ export default async function GuidePage({ params }: { params: Params }) {
           )}
         </header>
         
-        <div className="prose prose-invert prose-p:text-white/80 prose-p:leading-[1.8] prose-p:mb-8 prose-headings:text-white prose-headings:font-sans prose-headings:font-bold prose-h2:text-2xl prose-h2:mt-16 prose-h2:mb-6 prose-h3:text-xl prose-h3:mt-12 prose-h3:mb-4 prose-strong:text-white prose-strong:font-bold prose-li:text-white/80 prose-li:mb-3 prose-ul:mb-8 prose-ol:mb-8 max-w-none text-[17px] selection:bg-accent-vibrant/30">
-          <SoftGate isGated={guide.meta.gated} user={user}>
+        <div className="prose prose-invert prose-p:text-white/80 prose-p:leading-[1.8] prose-p:mb-8 prose-headings:text-white prose-headings:font-helvetica prose-headings:font-bold prose-h2:text-2xl prose-h2:mt-16 prose-h2:mb-6 prose-h3:text-xl prose-h3:mt-12 prose-h3:mb-4 prose-strong:text-white prose-strong:font-bold prose-li:text-white/80 prose-li:mb-3 prose-ul:mb-8 prose-ol:mb-8 max-w-none text-[17px] selection:bg-accent-vibrant/30">
+          <SoftGate isGated={guide.meta.gated}>
             <MDXRemote source={guide.content} />
           </SoftGate>
         </div>

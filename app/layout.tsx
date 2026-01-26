@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { SearchProvider } from "@/components/layout/search-context";
+import { SearchModal } from "@/components/layout/search-modal";
+import { AuthProvider } from "@/components/auth/auth-context";
+import { AuthModal } from "@/components/auth/auth-modal";
+import { ThemeProvider } from "@/components/layout/theme-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,8 +18,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Virals Club Deutschland | The growth engineers mindset",
-  description: "Die exklusive Plattform für virale Marketing-Strategien, AI-Prompts und Growth Case Studies in Deutschland.",
+  title: "Virals Club | The growth engineers mindset",
+  description: "Die exklusive Plattform für virale Marketing-Strategien, AI-Prompts und Growth Case Studies.",
+  metadataBase: new URL("https://virals.club"),
 };
 
 export default function RootLayout({
@@ -24,8 +30,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de" className="dark">
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-black`}>
-        {children}
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased dark:bg-black bg-white`}>
+        <ThemeProvider>
+          <AuthProvider>
+            <SearchProvider>
+              {children}
+              <SearchModal />
+              <AuthModal />
+            </SearchProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

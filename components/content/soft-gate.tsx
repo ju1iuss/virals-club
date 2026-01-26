@@ -3,15 +3,16 @@
 import { useState, useEffect } from "react";
 import { Lock, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useScroll } from "framer-motion";
+import { useAuth } from "@/components/auth/auth-context";
 
 interface SoftGateProps {
   children: React.ReactNode;
   isGated: boolean;
-  user: any;
 }
 
-export function SoftGate({ children, isGated, user }: SoftGateProps) {
+export function SoftGate({ children, isGated }: SoftGateProps) {
+  const { user, openModal } = useAuth();
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const { scrollYProgress } = useScroll();
@@ -133,7 +134,10 @@ export function SoftGate({ children, isGated, user }: SoftGateProps) {
                     transition={{ delay: 0.5 }}
                     className="w-full space-y-4"
                   >
-                    <button className="w-full bg-accent-vibrant text-black font-bold py-4 rounded-2xl hover:bg-accent-vibrant/90 hover:scale-[1.01] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 group/btn shadow-[0_10px_30px_rgba(34,197,94,0.3)] text-sm uppercase tracking-widest">
+                    <button 
+                      onClick={openModal}
+                      className="w-full bg-accent-vibrant text-black font-bold py-4 rounded-2xl hover:bg-accent-vibrant/90 hover:scale-[1.01] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 group/btn shadow-[0_10px_30px_rgba(34,197,94,0.3)] text-sm uppercase tracking-widest"
+                    >
                       GRATIS ANMELDEN
                       <Sparkles className="w-4 h-4" />
                     </button>

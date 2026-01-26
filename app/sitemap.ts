@@ -4,7 +4,7 @@ import { MetadataRoute } from "next";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const guides = await getAllGuides();
   const guideUrls = guides.map((guide) => ({
-    url: `https://viralsclub.de/guides/${guide.slug}`,
+    url: `https://virals.club/guides/${guide.slug}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.8,
@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: "https://viralsclub.de",
+      url: "https://virals.club",
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 1,

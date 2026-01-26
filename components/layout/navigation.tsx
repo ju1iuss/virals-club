@@ -27,8 +27,8 @@ export function Navigation() {
           className={cn(
             "text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap py-1 relative",
             pathname === item.href 
-              ? "text-white after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-accent-vibrant" 
-              : "text-white/40 hover:text-white/80 hover:after:content-[''] hover:after:absolute hover:after:bottom-0 hover:after:left-0 hover:after:w-full hover:after:h-[1px] hover:after:bg-white/20"
+              ? "text-black dark:text-white after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-accent-vibrant" 
+              : "text-black/60 dark:text-white/40 hover:text-black dark:hover:text-white/80 hover:after:content-[''] hover:after:absolute hover:after:bottom-0 hover:after:left-0 hover:after:w-full hover:after:h-[1px] hover:after:bg-black/30 dark:hover:after:bg-white/20"
           )}
         >
           {item.label}

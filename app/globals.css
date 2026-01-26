@@ -9,6 +9,11 @@
   --font-sans: "Inter", sans-serif;
 }
 
+:root:not(.dark) {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
@@ -68,11 +73,11 @@ body {
 }
 
 .prose h2 {
-  @apply text-2xl md:text-3xl font-serif mt-16 mb-6;
+  @apply text-2xl md:text-3xl font-helvetica font-bold mt-16 mb-6;
 }
 
 .prose h3 {
-  @apply text-xl md:text-2xl font-sans mt-12 mb-4;
+  @apply text-xl md:text-2xl font-helvetica font-bold mt-12 mb-4;
 }
 
 .prose p {
@@ -103,5 +108,5 @@ body {
 }
 
 .divider-subtle {
-  @apply border-white/5;
+  @apply border-white/5 dark:border-white/5 border-black/10;
 }
