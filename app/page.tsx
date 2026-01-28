@@ -17,12 +17,6 @@ export default function Home() {
           <Sidebar />
         </main>
       </div>
-      
-      <footer className="border-t divider-subtle py-10 mt-20">
-        <div className="container mx-auto max-w-[1200px] px-4 text-center text-xs text-black/60 dark:text-white/30">
-          &copy; 2026 Virals Club Deutschland. Alle Rechte vorbehalten.
-        </div>
-      </footer>
     </div>
   );
 }

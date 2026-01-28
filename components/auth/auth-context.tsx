@@ -6,10 +6,14 @@ import { User } from "@supabase/supabase-js";
 
 interface AuthContextType {
   user: User | null;
+  isAdmin: boolean;
   loading: boolean;
   isModalOpen: boolean;
+  isProfileOpen: boolean;
   openModal: () => void;
   closeModal: () => void;
+  openProfile: () => void;
+  closeProfile: () => void;
   signOut: () => Promise<void>;
 }
 
@@ -17,13 +21,30 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
+    const fetchProfile = async (userId: string) => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", userId)
+        .single();
+      setIsAdmin(data?.is_admin || false);
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      if (currentUser) {
+        fetchProfile(currentUser.id);
+      } else {
+        setIsAdmin(false);
+      }
       setLoading(false);
     });
 
@@ -32,13 +53,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+  const openProfile = () => setIsProfileOpen(true);
+  const closeProfile = () => setIsProfileOpen(false);
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setIsProfileOpen(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, isModalOpen, openModal, closeModal, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isAdmin, 
+      loading, 
+      isModalOpen, 
+      isProfileOpen, 
+      openModal, 
+      closeModal, 
+      openProfile, 
+      closeProfile, 
+      signOut 
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -50,6 +50,25 @@ body {
 
 /* Typography Overrides for Premium feel */
 .prose {
+  --tw-prose-body: theme('colors.black / 70%');
+  --tw-prose-headings: theme('colors.black');
+  --tw-prose-lead: theme('colors.black / 60%');
+  --tw-prose-links: theme('colors.accent.vibrant');
+  --tw-prose-bold: theme('colors.black');
+  --tw-prose-counters: theme('colors.black / 40%');
+  --tw-prose-bullets: theme('colors.black / 20%');
+  --tw-prose-hr: theme('colors.black / 5%');
+  --tw-prose-quotes: theme('colors.black');
+  --tw-prose-quote-borders: theme('colors.accent.vibrant');
+  --tw-prose-captions: theme('colors.black / 40%');
+  --tw-prose-code: theme('colors.black');
+  --tw-prose-pre-code: theme('colors.black');
+  --tw-prose-pre-bg: theme('colors.black / 5%');
+  --tw-prose-th-borders: theme('colors.black / 10%');
+  --tw-prose-td-borders: theme('colors.black / 5%');
+}
+
+.dark .prose {
   --tw-prose-body: theme('colors.white / 70%');
   --tw-prose-headings: theme('colors.white');
   --tw-prose-lead: theme('colors.white / 60%');
@@ -69,19 +88,19 @@ body {
 }
 
 .prose blockquote {
-  @apply border-l-2 pl-6 italic font-serif text-xl text-white/90;
+  @apply border-l-2 pl-6 italic font-serif text-xl text-black/90 dark:text-white/90;
 }
 
 .prose h2 {
-  @apply text-2xl md:text-3xl font-helvetica font-bold mt-16 mb-6;
+  @apply text-2xl md:text-3xl font-helvetica font-bold mt-16 mb-6 text-black dark:text-white;
 }
 
 .prose h3 {
-  @apply text-xl md:text-2xl font-helvetica font-bold mt-12 mb-4;
+  @apply text-xl md:text-2xl font-helvetica font-bold mt-12 mb-4 text-black dark:text-white;
 }
 
 .prose p {
-  @apply mb-6 leading-relaxed;
+  @apply mb-6 leading-relaxed text-black/70 dark:text-white/70;
 }
 
 .prose ul, .prose ol {
@@ -89,7 +108,7 @@ body {
 }
 
 .prose li {
-  @apply pl-2;
+  @apply pl-2 text-black/70 dark:text-white/70;
 }
 
 /* Custom scrollbar for high density */

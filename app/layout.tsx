@@ -5,7 +5,10 @@ import { SearchProvider } from "@/components/layout/search-context";
 import { SearchModal } from "@/components/layout/search-modal";
 import { AuthProvider } from "@/components/auth/auth-context";
 import { AuthModal } from "@/components/auth/auth-modal";
+import { ProfileModal } from "@/components/auth/profile-modal";
 import { ThemeProvider } from "@/components/layout/theme-context";
+import { ArticleBanner } from "@/components/layout/article-banner";
+import { Footer } from "@/components/layout/footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,9 +21,13 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Virals Club | The growth engineers mindset",
+  title: "Virals Club Deutschland | The growth engineers mindset",
   description: "Die exklusive Plattform für virale Marketing-Strategien, AI-Prompts und Growth Case Studies.",
   metadataBase: new URL("https://virals.club"),
+  icons: {
+    icon: "/YC-white.png",
+    apple: "/YC-white.png",
+  },
 };
 
 export default function RootLayout({
@@ -34,9 +41,16 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <SearchProvider>
-              {children}
+              <div className="flex flex-col min-h-screen">
+                <main className="flex-grow">
+                  {children}
+                </main>
+                <Footer />
+              </div>
+              <ArticleBanner />
               <SearchModal />
               <AuthModal />
+              <ProfileModal />
             </SearchProvider>
           </AuthProvider>
         </ThemeProvider>

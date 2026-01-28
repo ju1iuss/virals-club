@@ -48,10 +48,10 @@ export function SoftGate({ children, isGated }: SoftGateProps) {
     <div className="relative">
       {!isLoaded ? (
         <div className="space-y-8 animate-pulse">
-          <div className="h-4 bg-white/5 rounded-full w-full" />
-          <div className="h-4 bg-white/5 rounded-full w-[90%]" />
-          <div className="h-4 bg-white/5 rounded-full w-[95%]" />
-          <div className="h-4 bg-white/5 rounded-full w-[85%]" />
+          <div className="h-4 bg-black/5 dark:bg-white/5 rounded-full w-full" />
+          <div className="h-4 bg-black/5 dark:bg-white/5 rounded-full w-[90%]" />
+          <div className="h-4 bg-black/5 dark:bg-white/5 rounded-full w-[95%]" />
+          <div className="h-4 bg-black/5 dark:bg-white/5 rounded-full w-[85%]" />
         </div>
       ) : (
         <motion.div 
@@ -64,7 +64,7 @@ export function SoftGate({ children, isGated }: SoftGateProps) {
         >
           {children}
           {hasScrolled && (
-            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0a0a0a] to-transparent z-10" />
+            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white dark:from-[#0a0a0a] to-transparent z-10" />
           )}
         </motion.div>
       )}
@@ -77,7 +77,7 @@ export function SoftGate({ children, isGated }: SoftGateProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] pointer-events-none"
+              className="fixed inset-0 bg-black/60 dark:bg-black/60 backdrop-blur-sm z-[90] pointer-events-none"
             />
             
             <motion.div 
@@ -92,9 +92,9 @@ export function SoftGate({ children, isGated }: SoftGateProps) {
               }}
               className="fixed inset-x-0 bottom-0 z-[100] flex justify-center pointer-events-none"
             >
-              <div className="bg-[#0a0a0a] border-t border-white/10 w-full max-w-[800px] rounded-t-[2.5rem] md:rounded-t-[3rem] p-8 md:p-12 pb-12 md:pb-16 pointer-events-auto relative overflow-hidden shadow-[0_-20px_60px_rgba(0,0,0,0.8)]">
+              <div className="bg-white dark:bg-[#0a0a0a] border-t border-black/10 dark:border-white/10 w-full max-w-[800px] rounded-t-[2.5rem] md:rounded-t-[3rem] p-8 md:p-12 pb-12 md:pb-16 pointer-events-auto relative overflow-hidden shadow-[0_-20px_60px_rgba(0,0,0,0.3)] dark:shadow-[0_-20px_60px_rgba(0,0,0,0.8)]">
                 {/* Drag Handle Decorator */}
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1 bg-white/10 rounded-full" />
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1 bg-black/10 dark:bg-white/10 rounded-full" />
                 
                 {/* Decorative Background Glows */}
                 <div className="absolute -top-24 -left-24 w-64 h-64 bg-accent-vibrant/10 rounded-full blur-[100px] pointer-events-none" />
@@ -105,7 +105,7 @@ export function SoftGate({ children, isGated }: SoftGateProps) {
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/10 mb-8 rotate-3 hover:rotate-0 transition-transform duration-500"
+                    className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-black/5 dark:bg-white/[0.03] border border-black/10 dark:border-white/10 mb-8 rotate-3 hover:rotate-0 transition-transform duration-500"
                   >
                     <Lock className="w-6 h-6 text-accent-vibrant" />
                   </motion.div>
@@ -114,7 +114,7 @@ export function SoftGate({ children, isGated }: SoftGateProps) {
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
-                    className="text-3xl md:text-4xl font-bold font-serif mb-4 text-white tracking-tight"
+                    className="text-3xl md:text-4xl font-bold font-serif mb-4 text-black dark:text-white tracking-tight"
                   >
                     Weiterlesen?
                   </motion.h3>
@@ -123,7 +123,7 @@ export function SoftGate({ children, isGated }: SoftGateProps) {
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.4 }}
-                    className="text-base text-white/50 mb-10 leading-relaxed font-sans"
+                    className="text-base text-black/50 dark:text-white/50 mb-10 leading-relaxed font-sans"
                   >
                     Melde dich kostenlos an, um Zugriff auf diesen Guide und alle weiteren exklusiven Inhalte zu erhalten.
                   </motion.p>
@@ -142,10 +142,10 @@ export function SoftGate({ children, isGated }: SoftGateProps) {
                       <Sparkles className="w-4 h-4" />
                     </button>
                     
-                    <div className="flex items-center justify-center gap-4 text-[10px] text-white/20 uppercase tracking-[0.2em] font-bold">
-                      <span className="h-[1px] w-8 bg-white/5" />
+                    <div className="flex items-center justify-center gap-4 text-[10px] text-black/20 dark:text-white/20 uppercase tracking-[0.2em] font-bold">
+                      <span className="h-[1px] w-8 bg-black/5 dark:bg-white/5" />
                       <span>Join 5,000+ Growth Engineers</span>
-                      <span className="h-[1px] w-8 bg-white/5" />
+                      <span className="h-[1px] w-8 bg-black/5 dark:bg-white/5" />
                     </div>
                   </motion.div>
                 </div>
