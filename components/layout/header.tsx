@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Search, User, Bell, Plus } from "lucide-react";
+import { Search, User, Bell, Plus, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SearchModal } from "./search-modal";
 import { useSearch } from "./search-context";
@@ -149,15 +149,16 @@ export function Header() {
             <>
               <button 
                 onClick={openAuth}
-                className="text-sm font-bold uppercase tracking-wider text-black/70 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors"
+                className="hidden md:block text-sm font-bold uppercase tracking-wider text-black/70 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors"
               >
                 Login
               </button>
               <button 
                 onClick={openAuth}
-                className="bg-black dark:bg-white text-white dark:text-black px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider hover:bg-accent-vibrant hover:text-white transition-all transform hover:scale-105 active:scale-95"
+                className="bg-black dark:bg-white text-white dark:text-black px-4 py-1.5 md:px-4 md:py-1.5 p-2 rounded-full text-xs font-black uppercase tracking-wider hover:bg-accent-vibrant hover:text-white transition-all transform hover:scale-105 active:scale-95 flex items-center gap-1.5"
               >
-                Join Club
+                <UserPlus className="w-4 h-4 md:hidden" />
+                <span className="hidden md:inline">Join Club</span>
               </button>
             </>
           )}

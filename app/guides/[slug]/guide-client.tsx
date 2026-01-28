@@ -28,6 +28,16 @@ interface GuideClientProps {
   children?: React.ReactNode;
 }
 
+const CATEGORIES = [
+  "Strategie",
+  "Formate",
+  "Trends",
+  "Meinung",
+  "Newcomer",
+  "The Growth Lab",
+  "Case Studies",
+];
+
 export function GuideClient({ guide: initialGuide, isAdmin: serverIsAdmin, mdxElement, children }: GuideClientProps) {
   const [guide, setGuide] = useState(initialGuide);
   const [isEditing, setIsEditing] = useState(false);
@@ -231,12 +241,16 @@ export function GuideClient({ guide: initialGuide, isAdmin: serverIsAdmin, mdxEl
           <div className="flex items-center gap-2 text-[10px] text-accent-vibrant font-bold tracking-[0.2em] uppercase mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-accent-vibrant animate-pulse" />
             {isEditing ? (
-              <input 
-                type="text"
+              <select 
                 value={guide.category}
                 onChange={(e) => setGuide({ ...guide, category: e.target.value })}
-                className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded px-2 py-1 focus:outline-none focus:border-accent-vibrant text-black dark:text-white"
-              />
+                className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded px-2 py-1 focus:outline-none focus:border-accent-vibrant text-black dark:text-white uppercase text-[10px] font-bold"
+              >
+                <option value="">Kategorie wählen</option>
+                {CATEGORIES.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
             ) : guide.category}
           </div>
 

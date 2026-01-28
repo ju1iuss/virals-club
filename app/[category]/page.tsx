@@ -3,8 +3,30 @@ import { Navigation } from "@/components/layout/navigation";
 import { Hero } from "@/components/home/hero";
 import { Feed } from "@/components/home/feed";
 import { Sidebar } from "@/components/layout/sidebar";
+import { notFound } from "next/navigation";
 
-export default function Home() {
+const CATEGORY_MAP: Record<string, string> = {
+  "strategie": "Strategie",
+  "formate": "Formate",
+  "trends": "Trends",
+  "meinung": "Meinung",
+  "newcomer": "Newcomer",
+  "lab": "The Growth Lab",
+  "case-studies": "Case Studies",
+};
+
+export default async function CategoryPage({
+  params,
+}: {
+  params: Promise<{ category: string }>;
+}) {
+  const { category: categorySlug } = await params;
+  const categoryName = CATEGORY_MAP[categorySlug];
+
+  if (!categoryName) {
+    notFound();
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -13,7 +35,7 @@ export default function Home() {
         <Navigation />
         
         <main className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-12 py-10">
-          <Feed category="Alle" />
+          <Feed category={categoryName} />
           <Sidebar />
         </main>
       </div>

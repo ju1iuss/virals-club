@@ -20,10 +20,68 @@ export function ArticleBanner() {
   const [isSupportOpen, setIsSupportOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [nextArticle, setNextArticle] = useState<Article | null>(null);
+  const [hasShownAfterReading, setHasShownAfterReading] = useState(false);
   const pathname = usePathname();
   const supabase = createClient();
+  const isReadingPage = pathname?.startsWith("/guides/") || pathname?.startsWith("/blog/");
+
+  // Check if mobile
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Listen for reading completion on reading pages
+  useEffect(() => {
+    if (!isReadingPage || isMobile || hasShownAfterReading) return;
+
+    let readingComplete = false;
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = window.innerHeight;
+      const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100;
+
+      // Show banner when user reaches 85% of the page
+      if (scrollPercentage >= 85 && !readingComplete) {
+        readingComplete = true;
+        
+        // Mark current article as read
+        const currentSlug = pathname.split("/").pop();
+        if (currentSlug) {
+          const seenSlugs = JSON.parse(localStorage.getItem("seen_articles") || "[]");
+          if (!seenSlugs.includes(currentSlug)) {
+            localStorage.setItem("seen_articles", JSON.stringify([...seenSlugs, currentSlug]));
+          }
+        }
+
+        // Trigger banner to show
+        setHasShownAfterReading(true);
+        const dismissed = sessionStorage.getItem("banner_dismissed");
+        if (!dismissed) {
+          setIsVisible(true);
+          setIsMinimized(false);
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isReadingPage, isMobile, pathname, hasShownAfterReading]);
 
   useEffect(() => {
+    // Don't show on mobile
+    if (isMobile) {
+      setIsVisible(false);
+      return;
+    }
+
     // Check if was dismissed or minimized in this session
     const dismissed = sessionStorage.getItem("banner_dismissed");
     if (dismissed === "minimized") {
@@ -54,19 +112,25 @@ export function ArticleBanner() {
         
         if (next) {
           setNextArticle(next);
-          const dismissed = sessionStorage.getItem("banner_dismissed");
-          if (!dismissed) {
-            setIsVisible(true);
-          } else if (dismissed === "minimized") {
-            setIsVisible(true);
-            setIsMinimized(true);
+          // Only auto-show if not on reading page (reading page will trigger via scroll)
+          if (!isReadingPage) {
+            const dismissed = sessionStorage.getItem("banner_dismissed");
+            if (!dismissed) {
+              setIsVisible(true);
+            } else if (dismissed === "minimized") {
+              setIsVisible(true);
+              setIsMinimized(true);
+            }
           }
         }
       }
     }
 
     fetchArticles();
-  }, [pathname, supabase]);
+    
+    // Reset reading completion flag when pathname changes
+    setHasShownAfterReading(false);
+  }, [pathname, supabase, isMobile, isReadingPage]);
 
   const handleDismiss = () => {
     setIsVisible(false);
@@ -86,10 +150,15 @@ export function ArticleBanner() {
       }
     }
     handleMinimize();
+    // Reset reading completion flag when navigating to new article
+    setHasShownAfterReading(false);
   };
 
+  // Don't render anything on mobile
+  if (isMobile) return null;
+
   if (!isVisible) return (
-    <div className="fixed bottom-6 left-6 z-[100]">
+    <div className="hidden md:flex fixed bottom-6 left-6 z-[100]">
       <button 
         onClick={() => { setIsVisible(true); setIsMinimized(true); }}
         className="w-12 h-12 bg-black border border-white/10 rounded-full shadow-2xl flex items-center justify-center text-white/40 hover:text-accent-vibrant transition-all hover:scale-110"
@@ -101,7 +170,7 @@ export function ArticleBanner() {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 w-full sm:bottom-6 sm:left-6 sm:w-auto z-[100]">
+      <div className="hidden md:flex fixed bottom-6 left-6 z-[100]">
         <AnimatePresence mode="wait">
           {isMinimized ? (
             <motion.div
@@ -109,7 +178,7 @@ export function ArticleBanner() {
               initial={{ opacity: 0, scale: 0.8, x: -20 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.8, x: -20 }}
-              className="flex items-center gap-2 p-1.5 bg-[#0a0a0a] border border-white/10 rounded-full shadow-2xl ml-4 mb-4 sm:ml-0 sm:mb-0"
+              className="flex items-center gap-2 p-1.5 bg-[#0a0a0a] border border-white/10 rounded-full shadow-2xl"
             >
               <button 
                 onClick={() => setIsMinimized(false)}
@@ -143,7 +212,7 @@ export function ArticleBanner() {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 50 }}
-              className="bg-[#0a0a0a] border border-white/10 sm:rounded-2xl shadow-2xl overflow-hidden p-5 relative w-full sm:w-[360px]"
+              className="bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden p-5 relative w-[360px]"
             >
               <button 
                 onClick={handleMinimize}

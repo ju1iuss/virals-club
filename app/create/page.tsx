@@ -20,7 +20,7 @@ export default async function CreatePage() {
       type: "guide",
       title: "New Page Title",
       subtitle: "Add a subtitle here",
-      category: "Uncategorized",
+      category: "Strategie",
       author: user?.email?.split('@')[0] || "VCD Team",
       date: new Date().toLocaleDateString("de-DE", { day: "numeric", month: "short", year: "numeric" }),
       read_time: "5 min read",

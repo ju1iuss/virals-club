@@ -9,6 +9,7 @@ import { ProfileModal } from "@/components/auth/profile-modal";
 import { ThemeProvider } from "@/components/layout/theme-context";
 import { ArticleBanner } from "@/components/layout/article-banner";
 import { Footer } from "@/components/layout/footer";
+import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,6 +39,17 @@ export default function RootLayout({
   return (
     <html lang="de" className="dark">
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased dark:bg-black bg-white`}>
+        <NextTopLoader 
+          color="#22c55e"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #22c55e,0 0 5px #22c55e"
+        />
         <ThemeProvider>
           <AuthProvider>
             <SearchProvider>
