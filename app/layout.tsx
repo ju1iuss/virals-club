@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { SearchProvider } from "@/components/layout/search-context";
 import { SearchModal } from "@/components/layout/search-modal";
@@ -39,6 +40,13 @@ export default function RootLayout({
   return (
     <html lang="de" className="dark">
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased dark:bg-black bg-white`}>
+        <Script
+          defer
+          data-website-id="dfid_iLhRPDq2xR3dj1dY2fqnB"
+          data-domain="virals.club"
+          src="https://datafa.st/js/script.js"
+          strategy="afterInteractive"
+        />
         <NextTopLoader 
           color="#22c55e"
           initialPosition={0.08}
