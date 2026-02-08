@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const { type, message, email } = await req.json();
+    const { type, message, email, to: customTo } = await req.json();
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
@@ -12,10 +12,11 @@ export async function POST(req: Request) {
 
     const senderEmail = email || 'anonymous@tasy.ai';
     const subject = `[Support] ${type.toUpperCase()} Request from ${senderEmail}`;
+    const recipientEmail = customTo || 'julius@tasy.ai';
 
     const { data, error } = await resend.emails.send({
       from: 'Virals Club Support <onboarding@resend.dev>', // Resend default for test
-      to: ['julius@tasy.ai'],
+      to: [recipientEmail],
       subject: subject,
       replyTo: senderEmail,
       html: `

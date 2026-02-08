@@ -8,7 +8,6 @@ import { AuthProvider } from "@/components/auth/auth-context";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileModal } from "@/components/auth/profile-modal";
 import { ThemeProvider } from "@/components/layout/theme-context";
-import { ArticleBanner } from "@/components/layout/article-banner";
 import { Footer } from "@/components/layout/footer";
 import NextTopLoader from "nextjs-toploader";
 
@@ -67,7 +66,6 @@ export default function RootLayout({
                 </main>
                 <Footer />
               </div>
-              <ArticleBanner />
               <SearchModal />
               <AuthModal />
               <ProfileModal />
