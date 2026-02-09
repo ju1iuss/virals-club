@@ -21,6 +21,7 @@ import { useAuth } from "@/components/auth/auth-context";
 import { createClient } from "@/lib/supabase/client";
 import { ArticleCard } from "@/components/home/article-card";
 import { AdCard } from "@/components/guides/ad-card";
+import { PostedAdCard } from "@/components/guides/posted-ad-card";
 
 interface GuideClientProps {
   guide: any;
@@ -208,7 +209,7 @@ export function GuideClient({ guide: initialGuide, isAdmin: serverIsAdmin, mdxEl
       <div className="container mx-auto max-w-[1280px] px-6">
         <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_240px] gap-12 py-12">
           <aside className="hidden lg:block space-y-6 sticky top-32 h-fit">
-            <AdCard />
+            <PostedAdCard />
           </aside>
 
           <article className="max-w-[720px] mx-auto text-black dark:text-white">
