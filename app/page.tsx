@@ -3,6 +3,9 @@ import { Navigation } from "@/components/layout/navigation";
 import { Hero } from "@/components/home/hero";
 import { Feed } from "@/components/home/feed";
 import { Sidebar } from "@/components/layout/sidebar";
+import { homeMetadata } from "@/lib/static-pages-meta";
+
+export const metadata = homeMetadata;
 
 export default function Home() {
   return (

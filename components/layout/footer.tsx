@@ -39,6 +39,9 @@ export function Footer() {
           <Link href="/resources" className="text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-colors text-sm">
             Ressourcen
           </Link>
+          <Link href="/wissen" className="text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-colors text-sm">
+            Wissen
+          </Link>
           <Link href="/guides" className="text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-colors text-sm">
             Guides
           </Link>

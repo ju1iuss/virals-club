@@ -2,6 +2,9 @@ import { Header } from "@/components/layout/header";
 import { RelatedContent } from "@/components/layout/related-content";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { legalImpressumMetadata } from "@/lib/static-pages-meta";
+
+export const metadata = legalImpressumMetadata;
 
 export default function ImpressumPage() {
   return (

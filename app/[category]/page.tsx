@@ -1,27 +1,30 @@
+import type { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Navigation } from "@/components/layout/navigation";
 import { Hero } from "@/components/home/hero";
 import { Feed } from "@/components/home/feed";
 import { Sidebar } from "@/components/layout/sidebar";
 import { notFound } from "next/navigation";
+import { buildCategoryMetadata, getCategoryLabel } from "@/lib/category-metadata";
 
-const CATEGORY_MAP: Record<string, string> = {
-  "strategie": "Strategie",
-  "formate": "Formate",
-  "trends": "Trends",
-  "meinung": "Meinung",
-  "newcomer": "Newcomer",
-  "lab": "The Growth Lab",
-  "case-studies": "Case Studies",
-};
+type Params = Promise<{ category: string }>;
 
-export default async function CategoryPage({
+export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ category: string }>;
-}) {
+  params: Params;
+}): Promise<Metadata> {
   const { category: categorySlug } = await params;
-  const categoryName = CATEGORY_MAP[categorySlug];
+  const meta = buildCategoryMetadata(categorySlug);
+  if (!meta) {
+    return { title: "Kategorie" };
+  }
+  return meta;
+}
+
+export default async function CategoryPage({ params }: { params: Params }) {
+  const { category: categorySlug } = await params;
+  const categoryName = getCategoryLabel(categorySlug);
 
   if (!categoryName) {
     notFound();
@@ -33,7 +36,7 @@ export default async function CategoryPage({
       <div className="container mx-auto max-w-[1200px] px-4">
         <Hero />
         <Navigation />
-        
+
         <main className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-12 py-10">
           <Feed category={categoryName} />
           <Sidebar />

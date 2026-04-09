@@ -2,6 +2,9 @@ import { Header } from "@/components/layout/header";
 import { RelatedContent } from "@/components/layout/related-content";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { legalAgbMetadata } from "@/lib/static-pages-meta";
+
+export const metadata = legalAgbMetadata;
 
 export default function TermsPage() {
   return (

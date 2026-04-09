@@ -14,16 +14,48 @@ interface Article {
   type: string;
 }
 
+const BANNER_PAGES_CACHE_KEY = "vc_banner_published_pages";
+const BANNER_CACHE_TTL_MS = 30 * 60 * 1000;
+
+function readPagesCache(): Article[] | null {
+  if (typeof sessionStorage === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(BANNER_PAGES_CACHE_KEY);
+    if (!raw) return null;
+    const { t, articles } = JSON.parse(raw) as {
+      t: number;
+      articles: Article[];
+    };
+    if (!articles?.length || Date.now() - t > BANNER_CACHE_TTL_MS) return null;
+    return articles;
+  } catch {
+    return null;
+  }
+}
+
+function writePagesCache(articles: Article[]) {
+  try {
+    sessionStorage.setItem(
+      BANNER_PAGES_CACHE_KEY,
+      JSON.stringify({ t: Date.now(), articles })
+    );
+  } catch {
+    /* ignore quota */
+  }
+}
+
 export function ArticleBanner() {
   const [isVisible, setIsVisible] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [nextArticle, setNextArticle] = useState<Article | null>(null);
+  const [pagesList, setPagesList] = useState<Article[] | null>(null);
   const [hasShownAfterReading, setHasShownAfterReading] = useState(false);
   const pathname = usePathname();
   const supabase = createClient();
-  const isReadingPage = pathname?.startsWith("/guides/") || pathname?.startsWith("/blog/");
+  const isReadingPage =
+    pathname?.startsWith("/guides/") || pathname?.startsWith("/blog/");
 
   // Check if mobile
   const [isMobile, setIsMobile] = useState(false);
@@ -75,21 +107,28 @@ export function ArticleBanner() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isReadingPage, isMobile, pathname, hasShownAfterReading]);
 
+  /** Load published pages once (sessionStorage 30m) — not on every navigation. */
   useEffect(() => {
-    // Don't show on mobile
     if (isMobile) {
       setIsVisible(false);
       return;
     }
 
-    // Check if was dismissed or minimized in this session
     const dismissed = sessionStorage.getItem("banner_dismissed");
     if (dismissed === "minimized") {
       setIsMinimized(true);
       setIsVisible(true);
     }
 
-    async function fetchArticles() {
+    let cancelled = false;
+
+    async function loadArticles() {
+      const cached = readPagesCache();
+      if (cached?.length) {
+        if (!cancelled) setPagesList(cached);
+        return;
+      }
+
       const { data: articles } = await supabase
         .from("pages")
         .select("title, slug, type")
@@ -97,40 +136,52 @@ export function ArticleBanner() {
         .eq("status", "published")
         .order("created_at", { ascending: false });
 
-      if (articles && articles.length > 0) {
-        const seenSlugs = JSON.parse(localStorage.getItem("seen_articles") || "[]");
-        
-        // Filter out current page if it's an article
-        const filteredArticles = articles.filter(a => !pathname.includes(a.slug));
-        
-        // Unread are those not in seenSlugs
-        const unread = articles.filter(a => !seenSlugs.includes(a.slug));
-        setUnreadCount(unread.length);
+      if (cancelled || !articles?.length) return;
 
-        // Next article is the first unread one that is not the current page
-        const next = unread.find(a => !pathname.includes(a.slug)) || filteredArticles[0];
-        
-        if (next) {
-          setNextArticle(next);
-          // Only auto-show if not on reading page (reading page will trigger via scroll)
-          if (!isReadingPage) {
-            const dismissed = sessionStorage.getItem("banner_dismissed");
-            if (!dismissed) {
-              setIsVisible(true);
-            } else if (dismissed === "minimized") {
-              setIsVisible(true);
-              setIsMinimized(true);
-            }
-          }
+      writePagesCache(articles);
+      setPagesList(articles);
+    }
+
+    void loadArticles();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isMobile, supabase]);
+
+  /** Recompute banner from in-memory list when route changes — no network. */
+  useEffect(() => {
+    if (isMobile || !pagesList?.length) return;
+
+    const path = pathname ?? "";
+    const seenSlugs = JSON.parse(
+      localStorage.getItem("seen_articles") || "[]"
+    ) as string[];
+
+    const filteredArticles = pagesList.filter((a) => !path.includes(a.slug));
+    const unread = pagesList.filter((a) => !seenSlugs.includes(a.slug));
+    setUnreadCount(unread.length);
+
+    const next =
+      unread.find((a) => !path.includes(a.slug)) || filteredArticles[0];
+
+    if (next) {
+      setNextArticle(next);
+      if (!isReadingPage) {
+        const dismissed = sessionStorage.getItem("banner_dismissed");
+        if (!dismissed) {
+          setIsVisible(true);
+        } else if (dismissed === "minimized") {
+          setIsVisible(true);
+          setIsMinimized(true);
         }
       }
     }
+  }, [pagesList, pathname, isReadingPage, isMobile]);
 
-    fetchArticles();
-    
-    // Reset reading completion flag when pathname changes
+  useEffect(() => {
     setHasShownAfterReading(false);
-  }, [pathname, supabase, isMobile, isReadingPage]);
+  }, [pathname]);
 
   const handleDismiss = () => {
     setIsVisible(false);

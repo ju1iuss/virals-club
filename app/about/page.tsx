@@ -2,6 +2,9 @@ import { Header } from "@/components/layout/header";
 import { RelatedContent } from "@/components/layout/related-content";
 import Image from "next/image";
 import { Target, Zap, TrendingUp, Users } from "lucide-react";
+import { aboutMetadata } from "@/lib/static-pages-meta";
+
+export const metadata = aboutMetadata;
 
 export default function AboutPage() {
   return (

@@ -42,13 +42,18 @@ export default function NotFound() {
               Vielleicht suchst du nach
             </h2>
             <div className="flex flex-wrap justify-center gap-3">
-              {["Strategie", "Trends", "Case Studies"].map((cat) => (
+              {[
+                { label: "Strategie", href: "/strategie" },
+                { label: "Trends", href: "/trends" },
+                { label: "Case Studies", href: "/case-studies" },
+                { label: "Wissen", href: "/wissen" },
+              ].map((item) => (
                 <Link
-                  key={cat}
-                  href={`/${cat.toLowerCase().replace(" ", "-")}`}
+                  key={item.href}
+                  href={item.href}
                   className="text-sm font-bold text-black/60 dark:text-white/40 hover:text-accent-vibrant transition-colors"
                 >
-                  {cat}
+                  {item.label}
                 </Link>
               ))}
             </div>

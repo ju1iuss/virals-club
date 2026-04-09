@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/json-ld";
+import { organizationJsonLd, websiteJsonLd, SITE_NAME, SITE_URL } from "@/lib/seo";
 import { Inter, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -9,6 +11,7 @@ import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileModal } from "@/components/auth/profile-modal";
 import { ThemeProvider } from "@/components/layout/theme-context";
 import { Footer } from "@/components/layout/footer";
+import { NewsletterPopup } from "@/components/layout/newsletter-popup";
 import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({
@@ -22,12 +25,33 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Virals Club Deutschland | The growth engineers mindset",
-  description: "Die exklusive Plattform für virale Marketing-Strategien, AI-Prompts und Growth Case Studies.",
-  metadataBase: new URL("https://virals.club"),
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Virals Club Deutschland | The growth engineers mindset",
+    template: `%s | ${SITE_NAME}`,
+  },
+  description:
+    "Die exklusive Plattform für virale Marketing-Strategien, AI-Prompts und Growth Case Studies.",
   icons: {
     icon: "/YC-white.png",
     apple: "/YC-white.png",
+  },
+  openGraph: {
+    type: "website",
+    locale: "de_DE",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: "Virals Club Deutschland | The growth engineers mindset",
+    description:
+      "Die exklusive Plattform für virale Marketing-Strategien, AI-Prompts und Growth Case Studies.",
+    images: [{ url: "/YC-white.png" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Virals Club Deutschland | The growth engineers mindset",
+    description:
+      "Die exklusive Plattform für virale Marketing-Strategien, AI-Prompts und Growth Case Studies.",
+    images: ["/YC-white.png"],
   },
 };
 
@@ -39,6 +63,8 @@ export default function RootLayout({
   return (
     <html lang="de" className="dark">
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased dark:bg-black bg-white`}>
+        <JsonLd data={organizationJsonLd} />
+        <JsonLd data={websiteJsonLd} />
         <Script
           defer
           data-website-id="dfid_iLhRPDq2xR3dj1dY2fqnB"
@@ -67,6 +93,7 @@ export default function RootLayout({
                 <Footer />
               </div>
               <SearchModal />
+              <NewsletterPopup />
               <AuthModal />
               <ProfileModal />
             </SearchProvider>

@@ -1,6 +1,9 @@
 import { Header } from "@/components/layout/header";
 import { RelatedContent } from "@/components/layout/related-content";
 import { AdvertiseClient } from "./advertise-client";
+import { advertiseMetadata } from "@/lib/static-pages-meta";
+
+export const metadata = advertiseMetadata;
 
 export default function AdvertisePage() {
   return (

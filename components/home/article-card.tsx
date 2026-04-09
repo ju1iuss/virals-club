@@ -41,7 +41,7 @@ export function ArticleCard({ id, category, author, title, excerpt, date, readTi
       }
     };
     checkSaved();
-  }, [user, id, supabase]);
+  }, [user, id]);
 
   const toggleSave = async (e: React.MouseEvent) => {
     e.preventDefault();

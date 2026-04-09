@@ -23,12 +23,16 @@ import { createClient } from "@/lib/supabase/client";
 import { ArticleCard } from "@/components/home/article-card";
 import { AdCard } from "@/components/guides/ad-card";
 import { PostedAdCard } from "@/components/guides/posted-ad-card";
+import { Breadcrumbs, type BreadcrumbItem } from "@/components/seo/breadcrumbs";
+import { SITE_URL, ogImageUrl } from "@/lib/seo";
 
 interface GuideClientProps {
   guide: any;
   isAdmin: boolean;
   mdxElement?: React.ReactNode;
   children?: React.ReactNode;
+  breadcrumbItems?: BreadcrumbItem[];
+  canonicalUrl: string;
 }
 
 const CATEGORIES = [
@@ -41,7 +45,14 @@ const CATEGORIES = [
   "Case Studies",
 ];
 
-export function GuideClient({ guide: initialGuide, isAdmin: serverIsAdmin, mdxElement, children }: GuideClientProps) {
+export function GuideClient({
+  guide: initialGuide,
+  isAdmin: serverIsAdmin,
+  mdxElement,
+  children,
+  breadcrumbItems = [],
+  canonicalUrl,
+}: GuideClientProps) {
   const [guide, setGuide] = useState(initialGuide);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -70,7 +81,7 @@ export function GuideClient({ guide: initialGuide, isAdmin: serverIsAdmin, mdxEl
       }
     };
     checkSaved();
-  }, [user, guide.id, supabase]);
+  }, [user, guide.id]);
 
   const toggleSave = async () => {
     if (!user) {
@@ -204,14 +215,34 @@ export function GuideClient({ guide: initialGuide, isAdmin: serverIsAdmin, mdxEl
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
-      <JsonLd data={{
-        "@context": "https://schema.org",
-        "@type": "Article",
-        "headline": guide.title,
-        "author": { "@type": "Person", "name": guide.author || "VCD Team" },
-        "datePublished": guide.date || "",
-        "description": guide.subtitle || guide.title
-      }} />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: guide.title,
+          author: { "@type": "Person", name: guide.author || "VCD Team" },
+          ...(guide.date ? { datePublished: guide.date } : {}),
+          ...(guide.updated_at ? { dateModified: guide.updated_at } : {}),
+          description: guide.subtitle || guide.title,
+          url: canonicalUrl,
+          mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": canonicalUrl,
+          },
+          ...(ogImageUrl(guide.image)
+            ? { image: [ogImageUrl(guide.image)] }
+            : {}),
+          publisher: {
+            "@type": "Organization",
+            name: "Virals Club Deutschland",
+            url: SITE_URL,
+            logo: {
+              "@type": "ImageObject",
+              url: `${SITE_URL}/YC-white.png`,
+            },
+          },
+        }}
+      />
       
       <Header />
       
@@ -222,6 +253,7 @@ export function GuideClient({ guide: initialGuide, isAdmin: serverIsAdmin, mdxEl
           </aside>
 
           <article className="max-w-[720px] mx-auto text-black dark:text-white">
+            {breadcrumbItems.length > 0 && <Breadcrumbs items={breadcrumbItems} />}
             {isAdmin && (
               <div className="fixed bottom-8 right-8 z-[100] flex flex-col gap-3">
                 {!isEditing ? (
