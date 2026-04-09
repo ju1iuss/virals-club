@@ -10,11 +10,23 @@ import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import Highlight from "@tiptap/extension-highlight";
 import Typography from "@tiptap/extension-typography";
-import { 
-  Bold, Italic, List, ListOrdered, Quote, Heading1, Heading2, 
-  Code, Image as ImageIcon, Link as LinkIcon, CheckSquare, Upload
+import {
+  Bold,
+  Italic,
+  List,
+  ListOrdered,
+  Quote,
+  Heading1,
+  Heading2,
+  Code,
+  Image as ImageIcon,
+  Link as LinkIcon,
+  CheckSquare,
+  Upload,
+  Video,
 } from "lucide-react";
-import { uploadImage } from "@/lib/storage";
+import { uploadImage, uploadVideo } from "@/lib/storage";
+import { VideoExtensionEditor } from "@/lib/tiptap/video";
 import { useRef } from "react";
 
 interface EditorProps {
@@ -25,6 +37,7 @@ interface EditorProps {
 
 export function Editor({ content, onChange, editable = true }: EditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -40,6 +53,7 @@ export function Editor({ content, onChange, editable = true }: EditorProps) {
           class: "rounded-xl border border-white/10 glow-subtle max-w-full h-auto my-8",
         },
       }),
+      VideoExtensionEditor,
       Link.configure({
         openOnClick: false,
       }),
@@ -73,18 +87,41 @@ export function Editor({ content, onChange, editable = true }: EditorProps) {
         alert("Failed to upload image. Please try again.");
       }
     }
+    event.target.value = "";
+  };
+
+  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && editor) {
+      try {
+        const url = await uploadVideo(file);
+        editor.chain().focus().insertContent({ type: "video", attrs: { src: url } }).run();
+      } catch (error) {
+        console.error("Video upload failed:", error);
+        const message = error instanceof Error ? error.message : "Failed to upload video.";
+        alert(message);
+      }
+    }
+    event.target.value = "";
   };
 
   if (!editor) return null;
 
   return (
     <div className="relative w-full">
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        onChange={handleImageUpload} 
-        accept="image/*" 
-        className="hidden" 
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleImageUpload}
+        accept="image/*"
+        className="hidden"
+      />
+      <input
+        type="file"
+        ref={videoInputRef}
+        onChange={handleVideoUpload}
+        accept="video/mp4,video/webm,video/quicktime"
+        className="hidden"
       />
       
       {editable && editor && (
@@ -167,6 +204,13 @@ export function Editor({ content, onChange, editable = true }: EditorProps) {
               title="Upload Image"
             >
               <Upload className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => videoInputRef.current?.click()}
+              className="p-1.5 rounded hover:bg-white/10 transition-colors text-white/60"
+              title="Upload Video (max 10MB, MP4/WebM/MOV)"
+            >
+              <Video className="w-4 h-4" />
             </button>
             <button
               onClick={() => editor.chain().focus().toggleBlockquote().run()}

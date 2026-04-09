@@ -55,14 +55,28 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, slug, type, title, subtitle, category, author, date, read_time, gated, image, content } = body;
+    const {
+      id,
+      slug,
+      type,
+      title,
+      subtitle,
+      category,
+      author,
+      date,
+      read_time,
+      gated,
+      image,
+      header_video,
+      content,
+    } = body;
 
     if (!type) {
       return NextResponse.json({ error: "Type is required" }, { status: 400 });
     }
 
     const supabase = await createClient();
-    
+
     const pageData = {
       slug,
       type,
@@ -74,6 +88,7 @@ export async function POST(request: NextRequest) {
       read_time,
       gated,
       image,
+      header_video,
       content,
     };
 

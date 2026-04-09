@@ -16,7 +16,8 @@ import Typography from "@tiptap/extension-typography";
 import { Editor } from "@/components/admin/editor";
 import { Edit2, Save, X, Eye, Upload, Bookmark, Share2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { uploadImage } from "@/lib/storage";
+import { uploadImage, uploadVideo } from "@/lib/storage";
+import { VideoExtensionPublic } from "@/lib/tiptap/video";
 import { useAuth } from "@/components/auth/auth-context";
 import { createClient } from "@/lib/supabase/client";
 import { ArticleCard } from "@/components/home/article-card";
@@ -47,7 +48,7 @@ export function GuideClient({ guide: initialGuide, isAdmin: serverIsAdmin, mdxEl
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isShared, setIsShared] = useState(false);
-  const headerImageInputRef = useRef<HTMLInputElement>(null);
+  const headerMediaInputRef = useRef<HTMLInputElement>(null);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const subtitleRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
@@ -124,6 +125,7 @@ export function GuideClient({ guide: initialGuide, isAdmin: serverIsAdmin, mdxEl
   const extensions = [
     StarterKit.configure({ link: false }),
     ImageExtension,
+    VideoExtensionPublic,
     Link.configure({ openOnClick: false }),
     TaskList,
     TaskItem,
@@ -154,20 +156,27 @@ export function GuideClient({ guide: initialGuide, isAdmin: serverIsAdmin, mdxEl
     }
   };
 
-  const handleHeaderImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHeaderMediaUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       try {
         setSaving(true);
-        const url = await uploadImage(file);
-        setGuide({ ...guide, image: url });
+        if (file.type.startsWith("video/")) {
+          const url = await uploadVideo(file);
+          setGuide({ ...guide, header_video: url });
+        } else {
+          const url = await uploadImage(file);
+          setGuide({ ...guide, image: url });
+        }
       } catch (err) {
-        console.error("Header image upload failed:", err);
-        alert("Failed to upload header image.");
+        console.error("Header media upload failed:", err);
+        const message = err instanceof Error ? err.message : "Upload failed.";
+        alert(message);
       } finally {
         setSaving(false);
       }
     }
+    event.target.value = "";
   };
 
   let contentHtml = "";
@@ -371,47 +380,86 @@ export function GuideClient({ guide: initialGuide, isAdmin: serverIsAdmin, mdxEl
                 </div>
               </div>
 
-              {guide.image && (
-                <div className={`relative w-full aspect-[21/9] rounded-xl overflow-hidden mb-16 glow-subtle border border-black/10 dark:border-white/5 ${isEditing ? 'opacity-50' : ''}`}>
-                  <Image 
-                    src={guide.image} 
-                    alt={guide.title}
-                    fill
-                    className="object-cover scale-105 hover:scale-100 transition-transform duration-700"
-                    priority
-                  />
+              {(guide.header_video || guide.image) && (
+                <div
+                  className={`relative w-full ${
+                    guide.header_video ? "aspect-video" : "aspect-[21/9]"
+                  } rounded-xl overflow-hidden mb-16 glow-subtle border border-black/10 dark:border-white/5 ${
+                    isEditing ? "opacity-90" : ""
+                  }`}
+                >
+                  {guide.header_video ? (
+                    <video
+                      src={guide.header_video}
+                      poster={guide.image || undefined}
+                      controls
+                      playsInline
+                      preload="metadata"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Image
+                      src={guide.image}
+                      alt={guide.title}
+                      fill
+                      className="object-cover scale-105 hover:scale-100 transition-transform duration-700"
+                      priority
+                    />
+                  )}
                   {isEditing && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <button 
-                        onClick={() => headerImageInputRef.current?.click()}
-                        className="flex items-center gap-2 px-4 py-2 bg-black/60 dark:bg-black/60 backdrop-blur-md text-white rounded-full text-xs font-bold uppercase tracking-widest border border-white/10 hover:bg-black/80 transition-all"
+                    <div className="absolute inset-0 flex flex-wrap items-center justify-center gap-2 p-4 bg-black/40">
+                      <button
+                        type="button"
+                        onClick={() => headerMediaInputRef.current?.click()}
+                        className="flex items-center gap-2 px-4 py-2 bg-black/70 backdrop-blur-md text-white rounded-full text-xs font-bold uppercase tracking-widest border border-white/10 hover:bg-black/80 transition-all"
                       >
                         <Upload className="w-4 h-4" />
-                        Change Header Image
+                        Change header
                       </button>
+                      {guide.header_video && (
+                        <button
+                          type="button"
+                          onClick={() => setGuide({ ...guide, header_video: null })}
+                          className="px-4 py-2 bg-white/10 backdrop-blur-md text-white rounded-full text-xs font-bold uppercase tracking-widest border border-white/20 hover:bg-white/20 transition-all"
+                        >
+                          Remove video
+                        </button>
+                      )}
+                      {guide.image && (
+                        <button
+                          type="button"
+                          onClick={() => setGuide({ ...guide, image: null })}
+                          className="px-4 py-2 bg-white/10 backdrop-blur-md text-white rounded-full text-xs font-bold uppercase tracking-widest border border-white/20 hover:bg-white/20 transition-all"
+                        >
+                          Remove image
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
               )}
-              
-              {isEditing && !guide.image && (
+
+              {isEditing && !guide.image && !guide.header_video && (
                 <div className="mb-16">
-                  <button 
-                    onClick={() => headerImageInputRef.current?.click()}
-                    className="w-full aspect-[21/9] rounded-xl border-2 border-dashed border-black/10 dark:border-white/10 flex flex-col items-center justify-center gap-4 hover:border-accent-vibrant/50 hover:bg-black/5 dark:hover:bg-white/5 transition-all group"
+                  <button
+                    type="button"
+                    onClick={() => headerMediaInputRef.current?.click()}
+                    className="w-full aspect-video rounded-xl border-2 border-dashed border-black/10 dark:border-white/10 flex flex-col items-center justify-center gap-4 hover:border-accent-vibrant/50 hover:bg-black/5 dark:hover:bg-white/5 transition-all group"
                   >
                     <Upload className="w-8 h-8 text-black/20 dark:text-white/20 group-hover:text-accent-vibrant transition-colors" />
-                    <span className="text-xs font-bold uppercase tracking-widest text-black/40 dark:text-white/40 group-hover:text-black dark:group-hover:text-white transition-colors">Upload Header Image</span>
+                    <span className="text-xs font-bold uppercase tracking-widest text-black/40 dark:text-white/40 group-hover:text-black dark:group-hover:text-white transition-colors">
+                      Upload header image or video (video max 10MB)
+                    </span>
                   </button>
                 </div>
               )}
 
-              <input 
-                type="file" 
-                ref={headerImageInputRef} 
-                onChange={handleHeaderImageUpload} 
-                accept="image/*" 
-                className="hidden" 
+              <input
+                type="file"
+                ref={headerMediaInputRef}
+                onChange={handleHeaderMediaUpload}
+                accept="image/*,video/mp4,video/webm,video/quicktime"
+                className="hidden"
               />
               
               {isEditing && (
@@ -434,23 +482,44 @@ export function GuideClient({ guide: initialGuide, isAdmin: serverIsAdmin, mdxEl
                     </div>
                   </div>
 
-                  {!guide.image && (
+                  <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-widest text-black/40 dark:text-white/40 mb-2">Header Image URL (Optional)</label>
-                      <input 
+                      <label className="block text-[10px] font-bold uppercase tracking-widest text-black/40 dark:text-white/40 mb-2">
+                        Header image URL (optional)
+                      </label>
+                      <input
                         type="text"
                         value={guide.image || ""}
-                        onChange={(e) => setGuide({ ...guide, image: e.target.value })}
+                        onChange={(e) =>
+                          setGuide({ ...guide, image: e.target.value || null })
+                        }
                         className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent-vibrant text-black dark:text-white"
-                        placeholder="https://images.unsplash.com/..."
+                        placeholder="https://…"
                       />
                     </div>
-                  )}
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-widest text-black/40 dark:text-white/40 mb-2">
+                        Header video URL (optional, upload max 10MB)
+                      </label>
+                      <input
+                        type="text"
+                        value={guide.header_video || ""}
+                        onChange={(e) =>
+                          setGuide({
+                            ...guide,
+                            header_video: e.target.value || null,
+                          })
+                        }
+                        className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent-vibrant text-black dark:text-white"
+                        placeholder="https://…"
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
             </header>
             
-            <div className="prose dark:prose-invert prose-p:text-black/80 dark:prose-p:text-white/80 prose-p:leading-[1.8] prose-p:mb-8 prose-headings:text-black dark:prose-headings:text-white prose-headings:font-helvetica prose-headings:font-bold prose-h2:text-2xl prose-h2:mt-16 prose-h2:mb-6 prose-h3:text-xl prose-h3:mt-12 prose-h3:mb-4 prose-strong:text-black dark:prose-strong:text-white prose-strong:font-bold prose-li:text-black/80 dark:prose-li:text-white/80 prose-li:mb-3 prose-ul:mb-8 prose-ol:mb-8 max-w-none text-[17px] selection:bg-accent-vibrant/30">
+            <div className="prose dark:prose-invert prose-p:text-black/80 dark:prose-p:text-white/80 prose-p:leading-[1.8] prose-p:mb-8 prose-headings:text-black dark:prose-headings:text-white prose-headings:font-helvetica prose-headings:font-bold prose-h2:text-2xl prose-h2:mt-16 prose-h2:mb-6 prose-h3:text-xl prose-h3:mt-12 prose-h3:mb-4 prose-strong:text-black dark:prose-strong:text-white prose-strong:font-bold prose-li:text-black/80 dark:prose-li:text-white/80 prose-li:mb-3 prose-ul:mb-8 prose-ol:mb-8 max-w-none text-[17px] selection:bg-accent-vibrant/30 [&_video]:w-full [&_video]:max-w-full">
               {isEditing ? (
                 <Editor 
                   content={guide.content} 
